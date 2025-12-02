@@ -1,0 +1,50 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ML artifacts (large files)
+*.h5
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+data/raw/*
+!data/raw/.gitkeep
+models/*
+!models/.gitkeep
+
+# Logs
+logs/**/*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Secrets
+.env
+*.key
+credentials.json
+
+# Large source files (keep parsed versions)
+sources/pdfs/*
+!sources/pdfs/.gitkeep

@@ -1,0 +1,26 @@
+# Publishing Schedule
+# Tracks queued and published posts
+
+queued: []
+  # Example:
+  # - filename: 2025-12-02-healthcare-interoperability-basics.md
+  #   title: "Healthcare Interoperability Basics"
+  #   date: 2025-12-02
+  #   categories: [clinical]
+  #   added_at: "2025-12-02T14:30:00Z"
+  #   source: research/2025/December/02/01-healthcare-interoperability-basics/blog-post/final.md
+
+published: []
+  # Example:
+  # - filename: 2025-12-01-fhir-lab-orders.md
+  #   title: "Understanding FHIR Lab Orders"
+  #   date: 2025-12-01
+  #   url: https://datagodzilla.github.io/2025/12/01/fhir-lab-orders.html
+  #   published_at: "2025-12-01T20:00:00Z"
+
+# Statistics
+stats:
+  total_published: 0
+  total_queued: 0
+  last_published: null
+  last_queued: null

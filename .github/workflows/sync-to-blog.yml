@@ -1,0 +1,107 @@
+# Sync Posts to Blog
+# Automatically syncs posts from publish/queue/ to datagodzilla.github.io
+
+name: Sync Posts to Blog
+
+on:
+  push:
+    paths:
+      - 'publish/queue/**'
+  workflow_dispatch:
+    inputs:
+      post_path:
+        description: 'Specific post to publish (or "all")'
+        required: false
+        default: 'all'
+
+jobs:
+  sync-posts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout research-hub
+        uses: actions/checkout@v4
+        with:
+          path: research-hub
+
+      - name: Checkout blog repo
+        uses: actions/checkout@v4
+        with:
+          repository: datagodzilla/datagodzilla.github.io
+          token: ${{ secrets.BLOG_DEPLOY_TOKEN }}
+          path: blog
+          ref: master
+
+      - name: Check for posts to sync
+        id: check
+        run: |
+          cd research-hub
+          count=$(ls -1 publish/queue/*.md 2>/dev/null | wc -l || echo "0")
+          echo "post_count=$count" >> $GITHUB_OUTPUT
+          if [ "$count" -gt 0 ]; then
+            echo "Posts found: $count"
+          else
+            echo "No posts to sync"
+          fi
+
+      - name: Sync queued posts
+        if: steps.check.outputs.post_count > 0
+        run: |
+          cd research-hub
+          for post in publish/queue/*.md; do
+            if [ -f "$post" ]; then
+              filename=$(basename "$post")
+              cp "$post" ../blog/_posts/
+              echo "Synced: $filename"
+            fi
+          done
+
+      - name: Copy images if present
+        if: steps.check.outputs.post_count > 0
+        run: |
+          if [ -d "research-hub/publish/queue/images" ]; then
+            mkdir -p blog/assets/images/posts
+            cp -r research-hub/publish/queue/images/* blog/assets/images/posts/
+            echo "Images copied"
+          fi
+
+      - name: Commit and push to blog
+        if: steps.check.outputs.post_count > 0
+        run: |
+          cd blog
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Publish new posts from research-hub"
+            git push
+            echo "Posts published to blog!"
+          fi
+
+      - name: Archive published posts
+        if: steps.check.outputs.post_count > 0
+        run: |
+          cd research-hub
+          mkdir -p publish/published
+          for post in publish/queue/*.md; do
+            if [ -f "$post" ]; then
+              mv "$post" publish/published/
+            fi
+          done
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add publish/
+          if git diff --staged --quiet; then
+            echo "No archive changes"
+          else
+            git commit -m "Archive published posts"
+            git push
+          fi
+
+      - name: Summary
+        if: steps.check.outputs.post_count > 0
+        run: |
+          echo "## Publishing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Posts synced: ${{ steps.check.outputs.post_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "Blog URL: https://datagodzilla.github.io" >> $GITHUB_STEP_SUMMARY

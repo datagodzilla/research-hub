@@ -1,0 +1,67 @@
+# Daily Publishing Reminder
+# Checks the publish queue and sends a reminder if posts are waiting
+
+name: Daily Publishing Reminder
+
+on:
+  schedule:
+    - cron: '0 20 * * *'  # 8 PM UTC daily (adjust to your timezone)
+  workflow_dispatch:
+
+jobs:
+  check-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check publish queue
+        id: check
+        run: |
+          count=$(ls -1 publish/queue/*.md 2>/dev/null | wc -l || echo "0")
+          echo "queue_count=$count" >> $GITHUB_OUTPUT
+
+          if [ "$count" -gt 0 ]; then
+            echo "## Publish Queue Status" >> $GITHUB_STEP_SUMMARY
+            echo "You have **$count** post(s) ready to publish!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Queued Posts:" >> $GITHUB_STEP_SUMMARY
+            for post in publish/queue/*.md; do
+              if [ -f "$post" ]; then
+                echo "- $(basename "$post")" >> $GITHUB_STEP_SUMMARY
+              fi
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Run the **Sync Posts to Blog** workflow to publish." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Publish Queue Status" >> $GITHUB_STEP_SUMMARY
+            echo "No posts in the queue. Time to create some research!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Create issue reminder (if posts queued)
+        if: steps.check.outputs.queue_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const count = '${{ steps.check.outputs.queue_count }}';
+            const today = new Date().toISOString().split('T')[0];
+
+            // Check if reminder issue already exists for today
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'publish-reminder',
+              state: 'open'
+            });
+
+            const todayIssue = issues.data.find(i => i.title.includes(today));
+
+            if (!todayIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[Reminder] ${count} post(s) ready to publish - ${today}`,
+                body: `You have **${count}** post(s) waiting in the publish queue.\n\nRun the "Sync Posts to Blog" workflow to publish them to datagodzilla.github.io.`,
+                labels: ['publish-reminder']
+              });
+            }
