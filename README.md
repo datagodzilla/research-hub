@@ -1,4 +1,4 @@
-# DataGodzilla Research Hub
+# DATAGODZILLA Research Hub
 
 A unified research and ML projects hub for daily blog publishing to GitHub Pages.
 
@@ -47,7 +47,7 @@ All content is organized by date and automatically publishable to [datagodzilla.
 ## Folder Structure
 
 ```
-DataGodzilla/
+DATAGODZILLA/
 ├── .claude -> ~/agent-ai/profiles/research-hub/.claude
 ├── .github/
 │   └── workflows/
@@ -154,11 +154,11 @@ When posts are added to `publish/queue/`:
 Add to `~/.zshrc`:
 
 ```bash
-alias dg="cd ~/00_PROJECTS/DataGodzilla"
-alias daily-research="cd ~/00_PROJECTS/DataGodzilla && claude '/daily-research'"
-alias daily-publish="cd ~/00_PROJECTS/DataGodzilla && claude '/daily-publish'"
-alias research-status="cat ~/00_PROJECTS/DataGodzilla/publish/schedule.yml"
-alias queue-status="ls -la ~/00_PROJECTS/DataGodzilla/publish/queue/"
+alias dg="cd ~/00_PROJECTS/DATAGODZILLA"
+alias daily-research="cd ~/00_PROJECTS/DATAGODZILLA && claude '/daily-research'"
+alias daily-publish="cd ~/00_PROJECTS/DATAGODZILLA && claude '/daily-publish'"
+alias research-status="cat ~/00_PROJECTS/DATAGODZILLA/publish/schedule.yml"
+alias queue-status="ls -la ~/00_PROJECTS/DATAGODZILLA/publish/queue/"
 ```
 
 ## Categories & Tags
@@ -209,7 +209,7 @@ This profile includes 14 specialized agents:
 ### First Run
 
 ```bash
-cd ~/00_PROJECTS/DataGodzilla
+cd ~/00_PROJECTS/DATAGODZILLA
 /daily-research "my-first-topic"
 ```
 
