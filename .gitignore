@@ -48,3 +48,6 @@ credentials.json
 # Large source files (keep parsed versions)
 sources/pdfs/*
 !sources/pdfs/.gitkeep
+
+# GitHub Pages blog (separate repo)
+publish/blog/
